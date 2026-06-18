@@ -1,4 +1,4 @@
-export type ModuleId = 'metricas' | 'ventas' | 'productos' | 'empleados' | 'asistencia' | 'perfil';
+export type ModuleId = 'metricas' | 'ventas' | 'productos' | 'empleados' | 'asistencia' | 'perfil' | 'corte';
 
 export interface NavigationItem {
   id: ModuleId;
@@ -57,6 +57,21 @@ export interface Sale {
   items: SaleItem[];
   total: number;
   cashierName: string;
+  paymentMethod?: 'efectivo' | 'tarjeta';
+}
+
+export interface CorteDeCaja {
+  id: string;
+  date: string; // ISO String
+  cashierName: string;
+  totalCash: number;
+  totalCard: number;
+  totalSales: number;
+  expectedCash: number;
+  actualCash: number;
+  difference: number;
+  notes?: string;
+  status: 'Aprobado' | 'Pendiente' | 'Rechazado';
 }
 
 

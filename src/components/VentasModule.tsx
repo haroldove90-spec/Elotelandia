@@ -27,6 +27,7 @@ export default function VentasModule({ products, onAddSale, cashierName }: Venta
   const [cashReceived, setCashReceived] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showReceipt, setShowReceipt] = useState<Sale | null>(null);
+  const [activeTab, setActiveTab] = useState<'catalogo' | 'ticket'>('catalogo');
 
   // Filter only active products
   const activeProducts = products.filter(p => p.isActive);
@@ -82,13 +83,15 @@ export default function VentasModule({ products, onAddSale, cashierName }: Venta
       date: new Date().toISOString(),
       items: [...cart],
       total: cartTotal,
-      cashierName: cashierName || 'Cajero de Turno'
+      cashierName: cashierName || 'Cajero de Turno',
+      paymentMethod: paymentMethod
     };
 
     onAddSale(newSale);
     setShowReceipt(newSale);
     setCart([]);
     setCashReceived('');
+    setActiveTab('catalogo');
   };
 
   return (
@@ -115,10 +118,43 @@ export default function VentasModule({ products, onAddSale, cashierName }: Venta
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Selector de Pestañas en Móvil (Cajero / Dispositivo Móvil) */}
+      <div className="flex lg:hidden bg-[#064E3B]/5 p-1.5 rounded-2xl border border-[#064E3B]/10 gap-1.5 w-full select-none">
+        <button
+          type="button"
+          onClick={() => setActiveTab('catalogo')}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            activeTab === 'catalogo'
+              ? 'bg-[#064E3B] text-white shadow-sm'
+              : 'text-gray-500 hover:text-[#064E3B] hover:bg-white/50'
+          }`}
+        >
+          <Pizza className="w-4 h-4" />
+          <span>Catálogo Elotes</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('ticket')}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all relative cursor-pointer ${
+            activeTab === 'ticket'
+              ? 'bg-[#064E3B] text-white shadow-sm'
+              : 'text-gray-500 hover:text-[#064E3B] hover:bg-white/50'
+          }`}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          <span>Ver Ticket</span>
+          {cart.length > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-white ring-2 ring-[#FEFCE8]">
+              {cart.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
         
         {/* Catálogo de Paquetes/Productos (Col de 7) */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className={`${activeTab === 'catalogo' ? 'block' : 'hidden'} lg:block lg:col-span-7 space-y-4`}>
           
           {/* Barra de Búsqueda */}
           <div className="relative">
@@ -192,7 +228,7 @@ export default function VentasModule({ products, onAddSale, cashierName }: Venta
         </div>
 
         {/* Carrito de Compra (Ticket - Col de 5) */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className={`${activeTab === 'ticket' ? 'block' : 'hidden'} lg:block lg:col-span-5 space-y-4`}>
           
           <div className="bg-white border border-[#E5E7EB] rounded-3xl shadow-sm overflow-hidden flex flex-col">
             
@@ -396,6 +432,31 @@ export default function VentasModule({ products, onAddSale, cashierName }: Venta
           </div>
         )}
       </AnimatePresence>
+
+      {/* Barra Flotante de Acceso Rápido al Ticket */}
+      {cart.length > 0 && activeTab === 'catalogo' && (
+        <div className="fixed bottom-20 left-4 right-4 md:hidden z-40">
+          <button
+            type="button"
+            onClick={() => setActiveTab('ticket')}
+            className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-white font-black py-3.5 px-4 rounded-2xl shadow-xl border border-amber-600/15 flex items-center justify-between transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-xl bg-white/20">
+                <ShoppingCart className="w-4.5 h-4.5 text-white" />
+              </span>
+              <div className="text-left">
+                <p className="text-xs font-black uppercase tracking-wider">Ver Mi Ticket</p>
+                <p className="text-[10px] text-amber-100 font-bold leading-none mt-0.5">{cart.length} paquetes agregados</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-xl border border-white/15">
+              <span className="text-xs font-mono font-black">${cartTotal.toFixed(2)}</span>
+            </div>
+          </button>
+        </div>
+      )}
 
     </div>
   );

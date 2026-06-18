@@ -1,5 +1,5 @@
 import { ModuleId, UserProfile } from '../types';
-import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User } from 'lucide-react';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, ClipboardList } from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeModule: ModuleId;
@@ -14,12 +14,13 @@ export default function MobileBottomNav({ activeModule, setActiveModule, profile
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
     { id: 'empleados' as ModuleId, label: 'Empleados', icon: Users, color: 'text-elote-red' },
     { id: 'asistencia' as ModuleId, label: 'Asistencia', icon: UserCheck, color: 'text-emerald-400' },
+    { id: 'corte' as ModuleId, label: 'Corte', icon: ClipboardList, color: 'text-amber-500' },
     { id: 'perfil' as ModuleId, label: 'Perfil', icon: User, color: 'text-elote-gold' },
   ];
 
   const menuItems = rawMenuItems.filter(item => {
     if (profile.role === 'Cajero') {
-      return ['metricas', 'ventas', 'perfil'].includes(item.id);
+      return ['metricas', 'ventas', 'perfil', 'corte'].includes(item.id);
     }
     return true;
   });

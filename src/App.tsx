@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ModuleId, Product, Employee, UserProfile, Sale } from './types';
+import { ModuleId, Product, Employee, UserProfile, Sale, CorteDeCaja } from './types';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import MobileBottomNav from './components/MobileBottomNav';
@@ -9,6 +9,7 @@ import EmployeesModule from './components/EmployeesModule';
 import UserProfileModule from './components/UserProfileModule';
 import AttendanceModule from './components/AttendanceModule';
 import VentasModule from './components/VentasModule';
+import CorteModule from './components/CorteModule';
 import InstallPwaModal from './components/InstallPwaModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Coins, Sparkles } from 'lucide-react';
@@ -250,6 +251,54 @@ export default function App() {
     setSales(prev => [newSale, ...prev]);
   };
 
+  // State: Cortes de caja/Arqueos
+  const [cortes, setCortes] = useState<CorteDeCaja[]>(() => {
+    const saved = localStorage.getItem('elotelandia_cortes');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [
+      {
+        id: 'CRT-A92B1',
+        date: new Date(Date.now() - 3600000 * 24).toISOString(), // 24 hours ago
+        cashierName: 'Sofía Ruiz',
+        totalCash: 700,
+        totalCard: 450,
+        totalSales: 1150,
+        expectedCash: 700,
+        actualCash: 700,
+        difference: 0,
+        notes: 'Todo en orden en la sucursal de Vialidad Guadalupe. Cuadro de caja exacto.',
+        status: 'Aprobado'
+      },
+      {
+        id: 'CRT-G67X3',
+        date: new Date(Date.now() - 3600000 * 48).toISOString(), // 48 hours ago
+        cashierName: 'Mateo González',
+        totalCash: 1050,
+        totalCard: 0,
+        totalSales: 1050,
+        expectedCash: 1050,
+        actualCash: 1040,
+        difference: -10,
+        notes: 'Faltó cambiar monedas de $10 pesos al inicio del turno, reporte de diferencia.',
+        status: 'Aprobado'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_cortes', JSON.stringify(cortes));
+  }, [cortes]);
+
+  const handleAddCorte = (newCorte: CorteDeCaja) => {
+    setCortes(prev => [newCorte, ...prev]);
+  };
+
+  const handleUpdateCorteStatus = (corteId: string, status: 'Aprobado' | 'Rechazado') => {
+    setCortes(prev => prev.map(c => c.id === corteId ? { ...c, status } : c));
+  };
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('elotelandia_is_logged') === 'true';
   });
@@ -323,6 +372,17 @@ export default function App() {
         return <UserProfileModule profile={profile} setProfile={setProfile} />;
       case 'asistencia':
         return <AttendanceModule employees={employees} profile={profile} />;
+      case 'corte':
+        return (
+          <CorteModule 
+            sales={sales} 
+            cortes={cortes} 
+            role={profile.role} 
+            cashierName={profile.name} 
+            onAddCorte={handleAddCorte} 
+            onUpdateCorteStatus={handleUpdateCorteStatus} 
+          />
+        );
       default:
         return <MetricsModule products={products} employees={employees} sales={sales} />;
     }

@@ -1,5 +1,5 @@
 import { ModuleId, UserProfile } from '../types';
-import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut } from 'lucide-react';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut, ClipboardList } from 'lucide-react';
 
 interface SidebarProps {
   activeModule: ModuleId;
@@ -17,12 +17,13 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
     { id: 'empleados' as ModuleId, label: 'Empleados', icon: Users, color: 'text-elote-red' },
     { id: 'asistencia' as ModuleId, label: 'Control de Asistencia', icon: UserCheck, color: 'text-emerald-400' },
+    { id: 'corte' as ModuleId, label: 'Corte de Caja', icon: ClipboardList, color: 'text-amber-500' },
     { id: 'perfil' as ModuleId, label: 'Perfil del usuario', icon: User, color: 'text-elote-gold' },
   ];
 
   const menuItems = rawMenuItems.filter(item => {
     if (profile.role === 'Cajero') {
-      return ['metricas', 'ventas', 'perfil'].includes(item.id);
+      return ['metricas', 'ventas', 'perfil', 'corte'].includes(item.id);
     }
     return true; // Admin gets all modules
   });

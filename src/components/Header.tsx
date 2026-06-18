@@ -25,6 +25,8 @@ export default function Header({ activeModule, profile, onInstallClick, onLogout
         return 'Control de Asistencia';
       case 'perfil':
         return 'Mi perfil de usuario';
+      case 'corte':
+        return 'Arqueo y Corte de Caja';
       default:
         return 'Administración';
     }
