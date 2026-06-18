@@ -25,7 +25,8 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
     if (profile.role === 'Cajero') {
       return ['metricas', 'ventas', 'perfil', 'corte'].includes(item.id);
     }
-    return true; // Admin gets all modules
+    // Admin gets all modules except 'asistencia' for now
+    return item.id !== 'asistencia';
   });
 
 
