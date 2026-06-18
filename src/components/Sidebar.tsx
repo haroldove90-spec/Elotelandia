@@ -1,22 +1,32 @@
 import { ModuleId, UserProfile } from '../types';
-import { BarChart3, ShoppingBag, Users, UserCheck, User } from 'lucide-react';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut } from 'lucide-react';
 
 interface SidebarProps {
   activeModule: ModuleId;
   setActiveModule: (module: ModuleId) => void;
   profile: UserProfile;
+  onLogout?: () => void;
 }
 
-export default function Sidebar({ activeModule, setActiveModule, profile }: SidebarProps) {
+export default function Sidebar({ activeModule, setActiveModule, profile, onLogout }: SidebarProps) {
   const logoUrl = 'https://appdesignproyectos.com/Elotelandia.jpg';
 
-  const menuItems = [
+  const rawMenuItems = [
     { id: 'metricas' as ModuleId, label: 'Métricas', icon: BarChart3, color: 'text-elote-yellow' },
+    { id: 'ventas' as ModuleId, label: 'Punto de Venta', icon: ShoppingCart, color: 'text-emerald-500' },
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
     { id: 'empleados' as ModuleId, label: 'Empleados', icon: Users, color: 'text-elote-red' },
     { id: 'asistencia' as ModuleId, label: 'Control de Asistencia', icon: UserCheck, color: 'text-emerald-400' },
     { id: 'perfil' as ModuleId, label: 'Perfil del usuario', icon: User, color: 'text-elote-gold' },
   ];
+
+  const menuItems = rawMenuItems.filter(item => {
+    if (profile.role === 'Cajero') {
+      return ['metricas', 'ventas', 'perfil'].includes(item.id);
+    }
+    return true; // Admin gets all modules
+  });
+
 
   return (
     <aside className="w-64 bg-elote-dark text-white flex-col h-screen sticky top-0 left-0 hidden md:flex border-r border-white/5 z-20">
@@ -76,7 +86,7 @@ export default function Sidebar({ activeModule, setActiveModule, profile }: Side
       </nav>
 
       {/* Sidebar Footer with system metadata information */}
-      <div className="p-4 border-t border-white/5 bg-black/10">
+      <div className="p-4 border-t border-white/5 bg-black/10 space-y-3">
         <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/5">
           {profile.photoUrl ? (
             <img 
@@ -96,6 +106,16 @@ export default function Sidebar({ activeModule, setActiveModule, profile }: Side
           </div>
           <div className="w-2 h-2 rounded-full bg-elote-green shadow-sm shadow-elote-green/50 animate-pulse"></div>
         </div>
+
+        {onLogout && (
+          <button 
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-black bg-red-950/45 hover:bg-red-900/65 text-red-200 hover:text-white rounded-lg transition-all border border-red-500/20 shadow-2xs hover:scale-[1.02] cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Cambiar de Rol
+          </button>
+        )}
       </div>
     </aside>
   );

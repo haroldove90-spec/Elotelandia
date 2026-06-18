@@ -1,19 +1,29 @@
-import { ModuleId } from '../types';
-import { BarChart3, ShoppingBag, Users, UserCheck, User } from 'lucide-react';
+import { ModuleId, UserProfile } from '../types';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User } from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeModule: ModuleId;
   setActiveModule: (module: ModuleId) => void;
+  profile: UserProfile;
 }
 
-export default function MobileBottomNav({ activeModule, setActiveModule }: MobileBottomNavProps) {
-  const menuItems = [
+export default function MobileBottomNav({ activeModule, setActiveModule, profile }: MobileBottomNavProps) {
+  const rawMenuItems = [
     { id: 'metricas' as ModuleId, label: 'Métricas', icon: BarChart3, color: 'text-elote-yellow' },
+    { id: 'ventas' as ModuleId, label: 'Ventas', icon: ShoppingCart, color: 'text-emerald-500' },
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
     { id: 'empleados' as ModuleId, label: 'Empleados', icon: Users, color: 'text-elote-red' },
     { id: 'asistencia' as ModuleId, label: 'Asistencia', icon: UserCheck, color: 'text-emerald-400' },
     { id: 'perfil' as ModuleId, label: 'Perfil', icon: User, color: 'text-elote-gold' },
   ];
+
+  const menuItems = rawMenuItems.filter(item => {
+    if (profile.role === 'Cajero') {
+      return ['metricas', 'ventas', 'perfil'].includes(item.id);
+    }
+    return true;
+  });
+
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-elote-dark text-white border-t border-white/10 z-30 md:hidden shadow-[0_-8px_24px_rgba(0,0,0,0.3)]">

@@ -1,19 +1,22 @@
 import { ModuleId, UserProfile } from '../types';
-import { Calendar, Globe2, User, ChevronRight, Download } from 'lucide-react';
+import { Calendar, Globe2, ChevronRight, Download, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   activeModule: ModuleId;
   profile: UserProfile;
   onInstallClick: () => void;
+  onLogout?: () => void;
 }
 
-export default function Header({ activeModule, profile, onInstallClick }: HeaderProps) {
+export default function Header({ activeModule, profile, onInstallClick, onLogout }: HeaderProps) {
   const logoUrl = 'https://appdesignproyectos.com/Elotelandia.jpg';
 
   const getModuleTitle = (modId: ModuleId) => {
     switch (modId) {
       case 'metricas':
         return 'Panel de Métricas';
+      case 'ventas':
+        return 'Punto de Venta';
       case 'productos':
         return 'Gestión de Productos';
       case 'empleados':
@@ -26,6 +29,7 @@ export default function Header({ activeModule, profile, onInstallClick }: Header
         return 'Administración';
     }
   };
+
 
   // Obtain current date for realistic display without static hardcoded mock details
   const today = new Date();
@@ -117,6 +121,16 @@ export default function Header({ activeModule, profile, onInstallClick }: Header
               {profile.name.toLowerCase().replace(/\s+/g, '_')}
             </span>
           </div>
+
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="flex items-center justify-center p-2 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer shadow-2xs border border-red-200/40"
+              title="Cerrar sesión / Cambiar de Rol"
+            >
+              <LogOut className="w-4.5 h-4.5" />
+            </button>
+          )}
         </div>
       </div>
     </header>

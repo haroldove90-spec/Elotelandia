@@ -1,4 +1,4 @@
-export type ModuleId = 'metricas' | 'productos' | 'empleados' | 'asistencia' | 'perfil';
+export type ModuleId = 'metricas' | 'ventas' | 'productos' | 'empleados' | 'asistencia' | 'perfil';
 
 export interface NavigationItem {
   id: ModuleId;
@@ -28,7 +28,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  role: 'Administrador General' | 'Gerente de Sucursal';
+  role: 'Administrador General' | 'Gerente de Sucursal' | 'Cajero';
   photoUrl: string;
   branch: string;
 }
@@ -43,4 +43,20 @@ export interface AttendanceRecord {
   status: 'Puntual' | 'Retardo' | 'Falta' | 'Justificado';
   notes?: string;
 }
+
+export interface SaleItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Sale {
+  id: string;
+  date: string; // ISO String
+  items: SaleItem[];
+  total: number;
+  cashierName: string;
+}
+
 
