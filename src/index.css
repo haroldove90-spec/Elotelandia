@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Geometric Balance Theme Colors tailored to Elotelandia */
+  --color-elote-cream: #FEFCE8;      /* Warm golden yellow-cream background */
+  --color-elote-dark: #064E3B;       /* Forest emerald green sidebar background */
+  --color-elote-yellow: #F59E0B;     /* Amber-500 accent and highlights */
+  --color-elote-green: #166534;      /* Pure dark green */
+  --color-elote-bg-hover: #065F46;   /* Emerald hover state */
+  --color-elote-gold: #FCD34D;       /* Golden active text / border accent */
+  --color-elote-red: #B91C1C;        /* Salsa red accents */
+}
+
+body {
+  background-color: var(--color-elote-cream);
+  color: #111827; /* Dark gray for maximum text legibility */
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+

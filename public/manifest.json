@@ -1,0 +1,22 @@
+{
+  "name": "Elotelandia",
+  "short_name": "Elotelandia",
+  "description": "Sistema de Control de Asistencia y Gestión para Elotelandia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFDEC",
+  "theme_color": "#064E3B",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://appdesignproyectos.com/Elotelandia.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://appdesignproyectos.com/Elotelandia.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
