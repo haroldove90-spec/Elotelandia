@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ModuleId, Product, Employee, UserProfile, Sale, CorteDeCaja } from './types';
+import { ModuleId, Product, Employee, UserProfile, Sale, CorteDeCaja, Insumo, Proveedor, OrdenCompra } from './types';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import MobileBottomNav from './components/MobileBottomNav';
@@ -10,9 +10,12 @@ import UserProfileModule from './components/UserProfileModule';
 import AttendanceModule from './components/AttendanceModule';
 import VentasModule from './components/VentasModule';
 import CorteModule from './components/CorteModule';
+import InventarioModule from './components/InventarioModule';
+import ClientesModule from './components/ClientesModule';
 import InstallPwaModal from './components/InstallPwaModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Coins, Sparkles } from 'lucide-react';
+import { Customer } from './types';
 
 
 export default function App() {
@@ -55,59 +58,197 @@ export default function App() {
   };
 
 
-  // Shared state: products
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: '1',
-      name: 'PAQUETE AFICIONADO',
-      price: 350,
-      isActive: true,
-      items: [
-        '1 Charola de elote desgranado',
-        '16 costillas cortas de elote',
-        '1 charola de rodajas de elote',
-        '3 sabritas a elegir',
-        '3 refrescos de 400ml (Sabor a elegir)'
-      ]
-    },
-    {
-      id: '2',
-      name: 'PAQUETE CAMPEÓN',
-      price: 450,
-      isActive: true,
-      items: [
-        '3 Maruchaskas (Sabor de maruchan y sabritas a elegir)',
-        '3 Elotes empanizados (Sabritas a elegir)',
-        '3 Refrescos de 400ml (Sabor a elegir)'
-      ]
-    },
-    {
-      id: '3',
-      name: 'PAQUETE REPECHAJE',
-      price: 350,
-      isActive: true,
-      items: [
-        '10 Tostadas',
-        '1/2 kg de trompa curtida',
-        '1/2 kg de cuero curtido',
-        '1 lts de salsa jerezana',
-        '1 charola de rodajas de elote',
-        '3 refrescos de 400ml (Sabor a elegir)'
-      ]
-    },
-    {
-      id: '4',
-      name: 'PAQUETE FANÁTICO',
-      price: 360,
-      isActive: true,
-      items: [
-        '1 charola de elote con arrachera',
-        '1 charola de elote con champiñones',
-        '1 charola de elote con rajas',
-        '3 refrescos de 400ml (Sabor a elegir)'
-      ]
+  // Shared state: Customers (CRM Base)
+  const [customers, setCustomers] = useState<Customer[]>(() => {
+    const saved = localStorage.getItem('elotelandia_customers');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
-  ]);
+    return [
+      { id: 'CRM-A91B3', name: 'Karla Mendoza', phone: '4921004523', email: 'karla.m@gmail.com', points: 145, visitCount: 8, totalSpent: 1450, lastVisit: new Date(Date.now() - 3600000 * 48).toISOString(), notes: 'Le encanta elote empanizado con Cheetos Flamin Hot, doble limón.' },
+      { id: 'CRM-C22X8', name: 'Diego Torres Ruiz', phone: '4921085522', email: 'diego_torres@hotmail.com', points: 80, visitCount: 4, totalSpent: 800, lastVisit: new Date(Date.now() - 3600000 * 120).toISOString(), notes: 'Pide comanda para llevar los viernes por la tarde.' },
+      { id: 'CRM-X56Y1', name: 'Brenda Escobedo', phone: '4921102040', email: 'brend_esc@outlook.com', points: 210, visitCount: 12, totalSpent: 2100, lastVisit: new Date(Date.now() - 3600000 * 3).toISOString(), notes: 'Cliente frecuente VIP. Prefiere salsa jerezana extra.' },
+      { id: 'CRM-P90L4', name: 'Alejandro Carrillo', phone: '4921021199', points: 35, visitCount: 2, totalSpent: 350, lastVisit: new Date(Date.now() - 3600000 * 12).toISOString(), notes: 'Prefiere pagar con tarjeta de crédito.' }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_customers', JSON.stringify(customers));
+  }, [customers]);
+
+  // Shared state: products
+  const [products, setProducts] = useState<Product[]>(() => {
+    const saved = localStorage.getItem('elotelandia_products');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [
+      {
+        id: '1',
+        name: 'PAQUETE AFICIONADO',
+        price: 350,
+        isActive: true,
+        items: [
+          '1 Charola de elote desgranado',
+          '16 costillas cortas de elote',
+          '1 charola de rodajas de elote',
+          '3 sabritas a elegir',
+          '3 refrescos de 400ml (Sabor a elegir)'
+        ],
+        recipe: [
+          { insumoId: 'ins-1', quantity: 300 }, // 300g elote
+          { insumoId: 'ins-2', quantity: 60 },  // 60ml mayonesa
+          { insumoId: 'ins-3', quantity: 40 },  // 40g queso
+          { insumoId: 'ins-4', quantity: 1 },   // 1 vaso unicel
+          { insumoId: 'ins-5', quantity: 1 },   // 1 cuchara
+          { insumoId: 'ins-8', quantity: 3 },   // 3 refrescos
+          { insumoId: 'ins-10', quantity: 3 }   // 3 sabritas
+        ]
+      },
+      {
+        id: '2',
+        name: 'PAQUETE CAMPEÓN',
+        price: 450,
+        isActive: true,
+        items: [
+          '3 Maruchaskas (Sabor de maruchan y sabritas a elegir)',
+          '3 Elotes empanizados (Sabritas a elegir)',
+          '3 Refrescos de 400ml (Sabor a elegir)'
+        ],
+        recipe: [
+          { insumoId: 'ins-1', quantity: 450 }, // 450g elote
+          { insumoId: 'ins-2', quantity: 90 },  // 90ml mayonesa
+          { insumoId: 'ins-3', quantity: 60 },  // 60g queso
+          { insumoId: 'ins-5', quantity: 3 },   // 3 cucharas
+          { insumoId: 'ins-8', quantity: 3 },   // 3 refrescos
+          { insumoId: 'ins-9', quantity: 3 },   // 3 maruchans
+          { insumoId: 'ins-10', quantity: 3 }   // 3 sabritas
+        ]
+      },
+      {
+        id: '3',
+        name: 'PAQUETE REPECHAJE',
+        price: 350,
+        isActive: true,
+        items: [
+          '10 Tostadas',
+          '1/2 kg de trompa curtida',
+          '1/2 kg de cuero curtido',
+          '1 lts de salsa jerezana',
+          '1 charola de rodajas de elote',
+          '3 refrescos de 400ml (Sabor a elegir)'
+        ],
+        recipe: [
+          { insumoId: 'ins-1', quantity: 300 }, // 300g elote
+          { insumoId: 'ins-5', quantity: 1 },   // 1 cuchara
+          { insumoId: 'ins-8', quantity: 3 }    // 3 refrescos
+        ]
+      },
+      {
+        id: '4',
+        name: 'PAQUETE FANÁTICO',
+        price: 360,
+        isActive: true,
+        items: [
+          '1 charola de elote con arrachera',
+          '1 charola de elote con champiñones',
+          '1 charola de elote con rajas',
+          '3 refrescos de 400ml (Sabor a elegir)'
+        ],
+        recipe: [
+          { insumoId: 'ins-1', quantity: 600 }, // 600g elote
+          { insumoId: 'ins-2', quantity: 120 }, // 120ml mayonesa
+          { insumoId: 'ins-3', quantity: 80 },  // 80g queso
+          { insumoId: 'ins-5', quantity: 3 },   // 3 cucharas
+          { insumoId: 'ins-8', quantity: 3 }    // 3 refrescos
+        ]
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_products', JSON.stringify(products));
+  }, [products]);
+
+  // Shared state: Insumos (Supplies)
+  const [insumos, setInsumos] = useState<Insumo[]>(() => {
+    const saved = localStorage.getItem('elotelandia_insumos');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [
+      { id: 'ins-1', name: 'Elote Desgranado', stock: 15000, unit: 'g', minStock: 3000, cost: 0.05, supplierId: 'prov-1' }, // 15kg
+      { id: 'ins-2', name: 'Mayonesa Elotera', stock: 5000, unit: 'ml', minStock: 1000, cost: 0.08, supplierId: 'prov-2' }, // 5L
+      { id: 'ins-3', name: 'Queso Cotija Rallado', stock: 4000, unit: 'g', minStock: 800, cost: 0.12, supplierId: 'prov-1' }, // 4kg
+      { id: 'ins-4', name: 'Vasos Térmicos Unicel 8oz', stock: 250, unit: 'pzs', minStock: 50, cost: 1.5, supplierId: 'prov-3' },
+      { id: 'ins-5', name: 'Cucharas de Plástico', stock: 300, unit: 'pzs', minStock: 50, cost: 0.3, supplierId: 'prov-3' },
+      { id: 'ins-6', name: 'Mantequilla Premium', stock: 2000, unit: 'g', minStock: 500, cost: 0.15, supplierId: 'prov-2' },
+      { id: 'ins-7', name: 'Chile en Polvo (Tajín/Flamin)', stock: 1500, unit: 'g', minStock: 300, cost: 0.09, supplierId: 'prov-1' },
+      { id: 'ins-8', name: 'Refrescos Surtidos 400ml', stock: 120, unit: 'pzs', minStock: 30, cost: 12.0, supplierId: 'prov-4' },
+      { id: 'ins-9', name: 'Sopa Maruchan Instantánea', stock: 80, unit: 'pzs', minStock: 20, cost: 15.0, supplierId: 'prov-4' },
+      { id: 'ins-10', name: 'Papas Sabritas Surtidas', stock: 100, unit: 'pzs', minStock: 25, cost: 14.0, supplierId: 'prov-4' }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_insumos', JSON.stringify(insumos));
+  }, [insumos]);
+
+  // Shared state: Proveedores (Suppliers CRM)
+  const [proveedores, setProveedores] = useState<Proveedor[]>(() => {
+    const saved = localStorage.getItem('elotelandia_proveedores');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [
+      { id: 'prov-1', name: 'Distribuidora Agrícola del Bajío', contactName: 'Ing. Ramón Ruiz', phone: '492 555 0192', email: 'ventas@agrobajio.mx', address: 'Central de Abastos Bodega 45, Zacatecas' },
+      { id: 'prov-2', name: 'Lácteos y Cremerías de Jerez', contactName: 'Patricia Escobedo', phone: '494 924 1122', email: 'contacto@cremeria-jerez.com', address: 'Av. Constituyentes 402, Jerez, Zacatecas' },
+      { id: 'prov-3', name: 'Desechables Biodegradables del Norte', contactName: 'Carlos Alaniz', phone: '818 340 5000', email: 'pedidos@desechablesnorte.com', address: 'Parque Industrial Apodaca, NL' },
+      { id: 'prov-4', name: 'Comercializadora de Bebidas y Botanas', contactName: 'Marisela Gómez', phone: '492 120 4040', email: 'mgomez@bebidasbotanas.com', address: 'Calzada Héroes de Chapultepec, Zacatecas' }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_proveedores', JSON.stringify(proveedores));
+  }, [proveedores]);
+
+  // Shared state: Órdenes de compra (Purchase Orders Ledger)
+  const [ordenesCompra, setOrdenesCompra] = useState<OrdenCompra[]>(() => {
+    const saved = localStorage.getItem('elotelandia_ordenes');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [
+      {
+        id: 'OC-1002',
+        date: new Date(Date.now() - 3600000 * 24 * 3).toISOString(), // 3 days ago
+        supplierId: 'prov-1',
+        supplierName: 'Distribuidora Agrícola del Bajío',
+        items: [
+          { insumoId: 'ins-1', insumoName: 'Elote Desgranado', quantity: 20000, cost: 0.05 },
+          { insumoId: 'ins-3', insumoName: 'Queso Cotija Rallado', quantity: 5000, cost: 0.12 }
+        ],
+        total: 1600,
+        status: 'Recibido'
+      },
+      {
+        id: 'OC-1003',
+        date: new Date(Date.now() - 3600000 * 24).toISOString(), // 1 day ago
+        supplierId: 'prov-4',
+        supplierName: 'Comercializadora de Bebidas y Botanas',
+        items: [
+          { insumoId: 'ins-8', insumoName: 'Refrescos Surtidos 400ml', quantity: 50, cost: 12.0 },
+          { insumoId: 'ins-10', insumoName: 'Papas Sabritas Surtidas', quantity: 40, cost: 14.0 }
+        ],
+        total: 1160,
+        status: 'Pendiente'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_ordenes', JSON.stringify(ordenesCompra));
+  }, [ordenesCompra]);
 
   // Shared state: employees (10 samples as requested)
   const [employees, setEmployees] = useState<Employee[]>([
@@ -249,6 +390,47 @@ export default function App() {
 
   const handleAddSale = (newSale: Sale) => {
     setSales(prev => [newSale, ...prev]);
+
+    // Update customer CRM statistics if linked
+    if (newSale.customerId) {
+      setCustomers(prevCust => prevCust.map(c => {
+        if (c.id === newSale.customerId) {
+          const pointsEarned = Math.floor(newSale.total / 10);
+          return {
+            ...c,
+            points: c.points + pointsEarned,
+            visitCount: c.visitCount + 1,
+            totalSpent: c.totalSpent + newSale.total,
+            lastVisit: newSale.date
+          };
+        }
+        return c;
+      }));
+    }
+
+    // Real-time Stock Deduction: Automatically discount raw materials based on recipes
+    setInsumos(prevInsumos => {
+      return prevInsumos.map(insumo => {
+        let deductedQuantity = 0;
+        newSale.items.forEach(saleItem => {
+          const matchedProduct = products.find(p => p.id === saleItem.productId);
+          if (matchedProduct && matchedProduct.recipe) {
+            const recipeItem = matchedProduct.recipe.find(r => r.insumoId === insumo.id);
+            if (recipeItem) {
+              deductedQuantity += recipeItem.quantity * saleItem.quantity;
+            }
+          }
+        });
+
+        if (deductedQuantity > 0) {
+          return {
+            ...insumo,
+            stock: Math.max(0, insumo.stock - deductedQuantity)
+          };
+        }
+        return insumo;
+      });
+    });
   };
 
   // State: Cortes de caja/Arqueos
@@ -361,9 +543,19 @@ export default function App() {
   const renderActiveModule = () => {
     switch (activeModule) {
       case 'metricas':
-        return <MetricsModule products={products} employees={employees} sales={sales} />;
+        return <MetricsModule products={products} employees={employees} sales={sales} insumos={insumos} cortes={cortes} />;
       case 'ventas':
-        return <VentasModule products={products} onAddSale={handleAddSale} cashierName={profile.name} />;
+        return (
+          <VentasModule 
+            products={products} 
+            onAddSale={handleAddSale} 
+            cashierName={profile.name} 
+            customers={customers} 
+            setCustomers={setCustomers} 
+          />
+        );
+      case 'clientes':
+        return <ClientesModule customers={customers} setCustomers={setCustomers} sales={sales} />;
       case 'productos':
         return <ProductsModule products={products} setProducts={setProducts} />;
       case 'empleados':
@@ -383,8 +575,21 @@ export default function App() {
             onUpdateCorteStatus={handleUpdateCorteStatus} 
           />
         );
+      case 'inventario':
+        return (
+          <InventarioModule 
+            products={products}
+            setProducts={setProducts}
+            insumos={insumos}
+            setInsumos={setInsumos}
+            proveedores={proveedores}
+            setProveedores={setProveedores}
+            ordenesCompra={ordenesCompra}
+            setOrdenesCompra={setOrdenesCompra}
+          />
+        );
       default:
-        return <MetricsModule products={products} employees={employees} sales={sales} />;
+        return <MetricsModule products={products} employees={employees} sales={sales} insumos={insumos} cortes={cortes} />;
     }
   };
 

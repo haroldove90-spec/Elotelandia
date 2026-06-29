@@ -27,6 +27,10 @@ export default function Header({ activeModule, profile, onInstallClick, onLogout
         return 'Mi perfil de usuario';
       case 'corte':
         return 'Arqueo y Corte de Caja';
+      case 'inventario':
+        return 'Inventario Avanzado e Insumos';
+      case 'clientes':
+        return 'Base de Datos de Clientes (CRM)';
       default:
         return 'Administración';
     }

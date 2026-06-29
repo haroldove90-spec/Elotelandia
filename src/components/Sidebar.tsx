@@ -1,5 +1,5 @@
 import { ModuleId, UserProfile } from '../types';
-import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut, ClipboardList } from 'lucide-react';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut, ClipboardList, Package } from 'lucide-react';
 
 interface SidebarProps {
   activeModule: ModuleId;
@@ -14,7 +14,9 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
   const rawMenuItems = [
     { id: 'metricas' as ModuleId, label: 'Métricas', icon: BarChart3, color: 'text-elote-yellow' },
     { id: 'ventas' as ModuleId, label: 'Punto de Venta', icon: ShoppingCart, color: 'text-emerald-500' },
+    { id: 'clientes' as ModuleId, label: 'Clientes CRM', icon: Users, color: 'text-blue-400' },
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
+    { id: 'inventario' as ModuleId, label: 'Inventario Insumos', icon: Package, color: 'text-amber-400' },
     { id: 'empleados' as ModuleId, label: 'Empleados', icon: Users, color: 'text-elote-red' },
     { id: 'asistencia' as ModuleId, label: 'Control de Asistencia', icon: UserCheck, color: 'text-emerald-400' },
     { id: 'corte' as ModuleId, label: 'Corte de Caja', icon: ClipboardList, color: 'text-amber-500' },
@@ -23,10 +25,11 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
 
   const menuItems = rawMenuItems.filter(item => {
     if (profile.role === 'Cajero') {
-      return ['metricas', 'ventas', 'perfil', 'corte'].includes(item.id);
+      // Vendedor (Cajero) only gets POS, Corte de Caja, Perfil
+      return ['ventas', 'perfil', 'corte'].includes(item.id);
     }
-    // Admin gets all modules except 'asistencia' for now
-    return item.id !== 'asistencia';
+    // Admin gets all modules except 'asistencia' and 'ventas' (Punto de Venta)
+    return item.id !== 'asistencia' && item.id !== 'ventas';
   });
 
 
