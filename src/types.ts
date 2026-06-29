@@ -1,4 +1,4 @@
-export type ModuleId = 'metricas' | 'ventas' | 'productos' | 'empleados' | 'asistencia' | 'perfil' | 'corte' | 'inventario' | 'clientes';
+export type ModuleId = 'metricas' | 'ventas' | 'productos' | 'empleados' | 'asistencia' | 'perfil' | 'corte' | 'inventario' | 'clientes' | 'cocina_ordenes' | 'cocina_metricas';
 
 export interface NavigationItem {
   id: ModuleId;
@@ -34,7 +34,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  role: 'Administrador General' | 'Gerente de Sucursal' | 'Cajero';
+  role: 'Administrador General' | 'Gerente de Sucursal' | 'Cajero' | 'Cocina';
   photoUrl: string;
   branch: string;
 }
@@ -141,6 +141,18 @@ export interface OrdenCompra {
   items: OrdenCompraItem[];
   total: number;
   status: 'Pendiente' | 'Recibido' | 'Cancelado';
+}
+
+export interface ComandaCocina {
+  id: string;
+  saleId?: string;
+  orderName: string; // "Mesa X" or Client Name
+  date: string; // ISO string
+  items: SaleItem[];
+  status: 'Recibido' | 'Preparando' | 'Listo' | 'Entregado';
+  notes?: string;
+  tiempoInicio?: string; // ISO string when prep starts
+  tiempoFin?: string; // ISO string when prep ends
 }
 
 

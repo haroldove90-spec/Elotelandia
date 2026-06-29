@@ -13,9 +13,11 @@ import CorteModule from './components/CorteModule';
 import InventarioModule from './components/InventarioModule';
 import ClientesModule from './components/ClientesModule';
 import InstallPwaModal from './components/InstallPwaModal';
+import CocinaOrdenesModule from './components/CocinaOrdenesModule';
+import CocinaMetricasModule from './components/CocinaMetricasModule';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShieldCheck, Coins, Sparkles } from 'lucide-react';
-import { Customer } from './types';
+import { ShieldCheck, Coins, Sparkles, ChefHat } from 'lucide-react';
+import { Customer, ComandaCocina } from './types';
 
 
 export default function App() {
@@ -391,6 +393,19 @@ export default function App() {
   const handleAddSale = (newSale: Sale) => {
     setSales(prev => [newSale, ...prev]);
 
+    // Dispatch to Kitchen Comanda (perfect integration loop)
+    const comandaId = 'COM-' + (newSale.id.includes('-') ? newSale.id.split('-')[1] : newSale.id);
+    const newComanda: ComandaCocina = {
+      id: comandaId,
+      saleId: newSale.id,
+      orderName: newSale.customerName || 'Cliente General',
+      date: newSale.date,
+      items: newSale.items,
+      status: 'Recibido',
+      notes: newSale.items.map(it => it.notes).filter(Boolean).join('. ') || undefined
+    };
+    setComandas(prev => [newComanda, ...prev]);
+
     // Update customer CRM statistics if linked
     if (newSale.customerId) {
       setCustomers(prevCust => prevCust.map(c => {
@@ -481,6 +496,83 @@ export default function App() {
     setCortes(prev => prev.map(c => c.id === corteId ? { ...c, status } : c));
   };
 
+  // State for Kitchen Comandas
+  const [comandas, setComandas] = useState<ComandaCocina[]>(() => {
+    const saved = localStorage.getItem('elotelandia_comandas');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    const now = Date.now();
+    return [
+      {
+        id: 'COM-108A',
+        saleId: 'TKT-108A',
+        orderName: 'Mesa 4 (Sofía Ruiz)',
+        date: new Date(now - 3600000 * 3).toISOString(), // 3 hours ago
+        items: [
+          { productId: '1', productName: 'PAQUETE AFICIONADO', quantity: 2, price: 350 },
+          { productId: '2', productName: 'PAQUETE CAMPEÓN', quantity: 1, price: 450 }
+        ],
+        status: 'Entregado',
+        tiempoInicio: new Date(now - 3600000 * 3).toISOString(),
+        tiempoFin: new Date(now - 3600000 * 3 + 300000).toISOString() // 5 min preparation
+      },
+      {
+        id: 'COM-441F',
+        saleId: 'TKT-441F',
+        orderName: 'Mesa 2 (Diego Torres)',
+        date: new Date(now - 600000).toISOString(), // 10 minutes ago
+        items: [
+          { 
+            productId: '4', 
+            productName: 'PAQUETE FANÁTICO', 
+            quantity: 1, 
+            price: 360,
+            modifiers: [
+              { name: 'Sin Chile', priceDelta: 0 },
+              { name: '+ Queso Cotija Extra', priceDelta: 10 }
+            ],
+            notes: 'Pide chile del que no pica aparte por favor.'
+          }
+        ],
+        status: 'Listo',
+        tiempoInicio: new Date(now - 550000).toISOString(),
+        tiempoFin: new Date(now - 200000).toISOString()
+      },
+      {
+        id: 'COM-A23F',
+        orderName: 'Para Llevar - Brenda Escobedo',
+        date: new Date(now - 240000).toISOString(), // 4 minutes ago
+        items: [
+          { 
+            productId: '2', 
+            productName: 'PAQUETE CAMPEÓN', 
+            quantity: 1, 
+            price: 450,
+            modifiers: [
+              { name: 'Extra Salsa Jerezana', priceDelta: 0 }
+            ]
+          }
+        ],
+        status: 'Preparando',
+        tiempoInicio: new Date(now - 180000).toISOString()
+      },
+      {
+        id: 'COM-B55T',
+        orderName: 'Mesa 6 - Karla Mendoza',
+        date: new Date(now - 60000).toISOString(), // 1 minute ago
+        items: [
+          { productId: '3', productName: 'PAQUETE REPECHAJE', quantity: 1, price: 350 }
+        ],
+        status: 'Recibido'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elotelandia_comandas', JSON.stringify(comandas));
+  }, [comandas]);
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('elotelandia_is_logged') === 'true';
   });
@@ -509,7 +601,7 @@ export default function App() {
     localStorage.setItem('elotelandia_is_logged', String(isLoggedIn));
   }, [profile, isLoggedIn]);
 
-  const handleSelectRole = (role: 'Administrador' | 'Cajero') => {
+  const handleSelectRole = (role: 'Administrador' | 'Cajero' | 'Cocina') => {
     if (role === 'Administrador') {
       const adminProfile: UserProfile = {
         name: 'Administrador General',
@@ -521,7 +613,7 @@ export default function App() {
       };
       setProfile(adminProfile);
       setActiveModule('metricas');
-    } else {
+    } else if (role === 'Cajero') {
       const cashierProfile: UserProfile = {
         name: 'Cajero de Turno',
         email: 'cajero@elotelandia.com',
@@ -532,6 +624,17 @@ export default function App() {
       };
       setProfile(cashierProfile);
       setActiveModule('ventas'); // Go straight to POS
+    } else if (role === 'Cocina') {
+      const cocinaProfile: UserProfile = {
+        name: 'Maestro de Cocina (Chef)',
+        email: 'cocina@elotelandia.com',
+        phone: '492 111 2233',
+        role: 'Cocina',
+        photoUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=150',
+        branch: 'Sucursal Vialidad Guadalupe'
+      };
+      setProfile(cocinaProfile);
+      setActiveModule('cocina_ordenes'); // Go straight to kitchen
     }
     setIsLoggedIn(true);
   };
@@ -588,6 +691,23 @@ export default function App() {
             setOrdenesCompra={setOrdenesCompra}
           />
         );
+      case 'cocina_ordenes':
+        return (
+          <CocinaOrdenesModule 
+            comandas={comandas} 
+            setComandas={setComandas} 
+            products={products} 
+            insumos={insumos} 
+          />
+        );
+      case 'cocina_metricas':
+        return (
+          <CocinaMetricasModule 
+            comandas={comandas} 
+            products={products} 
+            insumos={insumos} 
+          />
+        );
       default:
         return <MetricsModule products={products} employees={employees} sales={sales} insumos={insumos} cortes={cortes} />;
     }
@@ -606,7 +726,7 @@ export default function App() {
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-sm bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl flex flex-col items-center text-center space-y-10 relative"
+          className="w-full max-w-md bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl flex flex-col items-center text-center space-y-10 relative"
         >
           {/* Circular styled logo in the center */}
           <div className="relative">
@@ -620,17 +740,17 @@ export default function App() {
           </div>
 
           <div className="w-full space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               
               {/* Option 1: Administrador */}
               <button
                 onClick={() => handleSelectRole('Administrador')}
-                className="flex flex-col items-center justify-center p-5 rounded-2xl bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 hover:border-amber-400 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 hover:border-amber-400 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
               >
-                <div className="w-14 h-14 rounded-full bg-[#064E3B] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
-                  <ShieldCheck className="w-7 h-7" />
+                <div className="w-12 h-12 rounded-full bg-[#064E3B] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
+                  <ShieldCheck className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-black text-[#064E3B] tracking-tight uppercase">
+                <span className="text-[10px] font-black text-[#064E3B] tracking-tight uppercase">
                   Admin
                 </span>
               </button>
@@ -638,13 +758,26 @@ export default function App() {
               {/* Option 2: Vendedor */}
               <button
                 onClick={() => handleSelectRole('Cajero')}
-                className="flex flex-col items-center justify-center p-5 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-200/60 hover:border-emerald-500 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-200/60 hover:border-emerald-500 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
               >
-                <div className="w-14 h-14 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
-                  <Coins className="w-7 h-7" />
+                <div className="w-12 h-12 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
+                  <Coins className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-black text-[#064E3B] tracking-tight uppercase">
+                <span className="text-[10px] font-black text-[#064E3B] tracking-tight uppercase">
                   Vendedor
+                </span>
+              </button>
+
+              {/* Option 3: Cocina */}
+              <button
+                onClick={() => handleSelectRole('Cocina')}
+                className="flex flex-col items-center justify-center p-4 rounded-2xl bg-amber-50/50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-500 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
+              >
+                <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
+                  <ChefHat className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-black text-[#064E3B] tracking-tight uppercase">
+                  Cocina
                 </span>
               </button>
 

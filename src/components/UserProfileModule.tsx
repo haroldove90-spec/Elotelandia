@@ -28,7 +28,7 @@ export default function UserProfileModule({ profile, setProfile }: UserProfileMo
   const [email, setEmail] = useState(profile.email);
   const [phone, setPhone] = useState(profile.phone);
   const [branch, setBranch] = useState(profile.branch);
-  const [role, setRole] = useState<'Administrador General' | 'Gerente de Sucursal'>(profile.role);
+  const [role, setRole] = useState<UserProfile['role']>(profile.role);
   const [photoUrl, setPhotoUrl] = useState(profile.photoUrl);
 
   // Password & Security form states
@@ -281,11 +281,13 @@ export default function UserProfileModule({ profile, setProfile }: UserProfileMo
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-widest font-mono">Rol Jerárquico</label>
                   <select 
                     value={role}
-                    onChange={(e) => setRole(e.target.value as 'Administrador General' | 'Gerente de Sucursal')}
+                    onChange={(e) => setRole(e.target.value as UserProfile['role'])}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-[#064E3B] text-sm text-[#111827] font-semibold bg-white"
                   >
                     <option value="Administrador General">🏷️ Administrador General</option>
                     <option value="Gerente de Sucursal">🧑‍💼 Gerente de Sucursal</option>
+                    <option value="Cajero">🪙 Vendedor / Cajero</option>
+                    <option value="Cocina">🍳 Cocina / Chef</option>
                   </select>
                 </div>
               </div>

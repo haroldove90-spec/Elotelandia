@@ -31,6 +31,10 @@ export default function Header({ activeModule, profile, onInstallClick, onLogout
         return 'Inventario Avanzado e Insumos';
       case 'clientes':
         return 'Base de Datos de Clientes (CRM)';
+      case 'cocina_ordenes':
+        return 'Comandas en Cocina (Preparación)';
+      case 'cocina_metricas':
+        return 'Rendimiento y Métricas de Cocina';
       default:
         return 'Administración';
     }

@@ -1,5 +1,5 @@
 import { ModuleId, UserProfile } from '../types';
-import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut, ClipboardList, Package } from 'lucide-react';
+import { BarChart3, ShoppingCart, ShoppingBag, Users, UserCheck, User, LogOut, ClipboardList, Package, ChefHat, Flame } from 'lucide-react';
 
 interface SidebarProps {
   activeModule: ModuleId;
@@ -14,6 +14,8 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
   const rawMenuItems = [
     { id: 'metricas' as ModuleId, label: 'Métricas', icon: BarChart3, color: 'text-elote-yellow' },
     { id: 'ventas' as ModuleId, label: 'Punto de Venta', icon: ShoppingCart, color: 'text-emerald-500' },
+    { id: 'cocina_ordenes' as ModuleId, label: 'Recibir Comandas', icon: ChefHat, color: 'text-[#F59E0B]' },
+    { id: 'cocina_metricas' as ModuleId, label: 'Rendimiento Cocina', icon: Flame, color: 'text-orange-500' },
     { id: 'clientes' as ModuleId, label: 'Clientes CRM', icon: Users, color: 'text-blue-400' },
     { id: 'productos' as ModuleId, label: 'Productos', icon: ShoppingBag, color: 'text-elote-green' },
     { id: 'inventario' as ModuleId, label: 'Inventario Insumos', icon: Package, color: 'text-amber-400' },
@@ -27,6 +29,10 @@ export default function Sidebar({ activeModule, setActiveModule, profile, onLogo
     if (profile.role === 'Cajero') {
       // Vendedor (Cajero) only gets POS, Corte de Caja, Perfil
       return ['ventas', 'perfil', 'corte'].includes(item.id);
+    }
+    if (profile.role === 'Cocina') {
+      // Cocina role gets Kitchen Orders, Kitchen Metrics, and Profile
+      return ['cocina_ordenes', 'cocina_metricas', 'perfil'].includes(item.id);
     }
     // Admin gets all modules except 'asistencia' and 'ventas' (Punto de Venta)
     return item.id !== 'asistencia' && item.id !== 'ventas';
