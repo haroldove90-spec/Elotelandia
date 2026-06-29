@@ -391,7 +391,7 @@ export default function App() {
   if (!isLoggedIn) {
     const logoUrl = 'https://appdesignproyectos.com/Elotelandia.jpg';
     return (
-      <div className="min-h-screen bg-[#FEFCE8]/80 flex items-center justify-center p-4 relative overflow-hidden text-elote-dark select-none">
+      <div className="min-h-screen bg-[#FEFCE8]/80 flex flex-col items-center justify-center p-6 relative overflow-hidden text-elote-dark select-none">
         
         {/* Background designs */}
         <div className="absolute top-0 right-0 -translate-x-10 translate-y-10 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -401,69 +401,49 @@ export default function App() {
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-8 shadow-xl flex flex-col items-center text-center space-y-8 relative"
+          className="w-full max-w-sm bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl flex flex-col items-center text-center space-y-10 relative"
         >
           {/* Circular styled logo in the center */}
-          <div className="relative group">
-            <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-md animate-pulse"></div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-amber-500/15 rounded-full blur-md animate-pulse"></div>
             <img 
               src={logoUrl} 
               alt="Elotelandia Logo" 
-              className="relative w-32 h-32 md:w-36 md:h-36 object-cover rounded-full border-4 border-[#064E3B] hover:scale-105 transition-all duration-300 shadow-sm"
+              className="relative w-36 h-36 object-cover rounded-full border-4 border-[#064E3B] shadow-sm hover:scale-102 transition-transform duration-300"
               referrerPolicy="no-referrer"
             />
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-3.5xl font-black text-[#064E3B] tracking-tight font-serif select-none">
-              Elotelandia
-            </h1>
-            <p className="text-xs text-gray-500 font-bold uppercase tracking-widest font-mono select-none">
-              Sistema de Gestión y POS
-            </p>
-          </div>
-
-          <div className="w-full space-y-4">
-            <p className="text-[11px] text-gray-400 font-extrabold uppercase tracking-widest">
-              Selecciona tu rol de acceso:
-            </p>
-
-            <div className="grid grid-cols-1 gap-4">
+          <div className="w-full space-y-6">
+            <div className="grid grid-cols-2 gap-4">
               
               {/* Option 1: Administrador */}
               <button
                 onClick={() => handleSelectRole('Administrador')}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#FEFCE8]/45 hover:bg-[#FEFCE8] border border-amber-200/50 hover:border-amber-400 hover:shadow-xs text-left group transition-all duration-200 cursor-pointer"
+                className="flex flex-col items-center justify-center p-5 rounded-2xl bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 hover:border-amber-400 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
               >
-                <div className="w-12 h-12 rounded-xl bg-amber-100 text-[#92400E] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform duration-200">
-                  <ShieldCheck className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-full bg-[#064E3B] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
+                  <ShieldCheck className="w-7 h-7" />
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-sm font-black text-amber-950">Administrador General</p>
-                  <p className="text-[10px] text-[#92400E]/70 font-bold leading-normal">Control total de inventario, métricas, personal y control de asistencia.</p>
-                </div>
+                <span className="text-xs font-black text-[#064E3B] tracking-tight uppercase">
+                  Admin
+                </span>
               </button>
 
-              {/* Option 2: Cajero */}
+              {/* Option 2: Vendedor */}
               <button
                 onClick={() => handleSelectRole('Cajero')}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl bg-emerald-50/45 hover:bg-emerald-50 border border-emerald-200/50 hover:border-emerald-500 hover:shadow-xs text-left group transition-all duration-200 cursor-pointer"
+                className="flex flex-col items-center justify-center p-5 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-200/60 hover:border-emerald-500 transition-all duration-250 group cursor-pointer text-center space-y-3 shadow-2xs"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform duration-200">
-                  <Coins className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-250">
+                  <Coins className="w-7 h-7" />
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-sm font-black text-emerald-950">Cajero / Operario POS</p>
-                  <p className="text-[10px] text-emerald-800/70 font-bold leading-normal">Venta rápida de paquetes, cobro ágil en caja y estatus de perfil.</p>
-                </div>
+                <span className="text-xs font-black text-[#064E3B] tracking-tight uppercase">
+                  Vendedor
+                </span>
               </button>
 
             </div>
-          </div>
-
-          <div className="pt-2 flex items-center justify-center gap-1.5 text-[9px] text-gray-400 font-mono uppercase tracking-widest">
-            <Sparkles className="w-3 h-3 text-amber-500 animate-pulse animate-duration-1000" />
-            <span>Elotelandia v1.6.0</span>
           </div>
 
         </motion.div>
